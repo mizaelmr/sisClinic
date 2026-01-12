@@ -17,12 +17,14 @@ import {
   paperClasses,
 } from '@mui/material';
 import Menu from '@mui/material/Menu';
-import { users } from 'data/users';
 import paths from 'routes/paths';
 import IconifyIcon from 'components/base/IconifyIcon';
 import StatusAvatar from 'components/base/StatusAvatar';
 import ProSnackbar from './ProSnackbar';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from 'providers/AuthProvider';
 
+// MENU DE PERFIL DO USUÁRIO
 interface ProfileMenuItemProps extends MenuItemProps {
   icon: string;
   href?: string;
@@ -30,9 +32,10 @@ interface ProfileMenuItemProps extends MenuItemProps {
 }
 
 const ProfileMenu = () => {
+  const { user, signOut } = useAuth();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
+  const navigate = useNavigate();
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -42,6 +45,19 @@ const ProfileMenu = () => {
     if (reason === 'clickaway') return;
     setSnackbarOpen(false);
   };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      handleClose();
+      navigate(paths.login);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
+  const displayName = user?.displayName || user?.email?.split('@')[0] || 'Usuário';
+  const userAvatar = user?.photoURL || undefined;
 
   const menuButton = (
     <Button
@@ -55,9 +71,9 @@ const ProfileMenu = () => {
       }}
     >
       <StatusAvatar
-        alt={demoUser.name}
+        alt={displayName}
         status="online"
-        src={demoUser.avatar ?? undefined}
+        src={userAvatar}
         sx={{
           width: 40,
           height: 40,
@@ -98,8 +114,8 @@ const ProfileMenu = () => {
         >
           <StatusAvatar
             status="online"
-            alt={demoUser.name}
-            src={demoUser.avatar ?? undefined}
+            alt={displayName}
+            src={userAvatar}
             sx={{ width: 48, height: 48 }}
           />
           <Box>
@@ -110,35 +126,22 @@ const ProfileMenu = () => {
                 mb: 0.5,
               }}
             >
-              {demoUser.name}
+              {displayName}
             </Typography>
-            {demoUser.designation && (
+            {user?.email && (
               <Typography
-                variant="subtitle2"
+                variant="body2"
                 sx={{
-                  color: 'warning.main',
+                  color: 'text.secondary',
                 }}
               >
-                {demoUser.designation}
-                <IconifyIcon
-                  icon="material-symbols:diamond-rounded"
-                  color="warning.main"
-                  sx={{ verticalAlign: 'text-bottom', ml: 0.5 }}
-                />
+                {user.email}
               </Typography>
             )}
           </Box>
         </Stack>
         <Divider />
         <Box sx={{ py: 1 }}>
-          <ProfileMenuItem icon="material-symbols:accessible-forward-rounded" onClick={handleClose}>
-            Accessibility
-          </ProfileMenuItem>
-
-          <ProfileMenuItem icon="material-symbols:settings-outline-rounded" onClick={handleClose}>
-            Preferences
-          </ProfileMenuItem>
-
           <ProfileMenuItem
             onClick={handleSnackbarOpen}
             icon="material-symbols:dark-mode-outline-rounded"
@@ -151,28 +154,26 @@ const ProfileMenu = () => {
         <Box sx={{ py: 1 }}>
           <ProfileMenuItem
             icon="material-symbols:manage-accounts-outline-rounded"
-            onClick={handleClose}
-            href="#!"
+            onClick={() => navigate(paths.account)}
           >
-            Account Settings
+            Configurações da Conta
           </ProfileMenuItem>
           <ProfileMenuItem
             icon="material-symbols:question-mark-rounded"
             onClick={handleClose}
-            href="#!"
           >
             Help Center
           </ProfileMenuItem>
         </Box>
         <Divider />
         <Box sx={{ py: 1 }}>
-          {demoUser ? (
-            <ProfileMenuItem onClick={handleClose} icon="material-symbols:logout-rounded">
-              Sign Out
+          {user ? (
+            <ProfileMenuItem onClick={handleSignOut} icon="material-symbols:logout-rounded">
+              Sair
             </ProfileMenuItem>
           ) : (
             <ProfileMenuItem href={paths.login} icon="material-symbols:login-rounded">
-              Sign In
+              Entrar
             </ProfileMenuItem>
           )}
         </Box>
@@ -205,11 +206,3 @@ const ProfileMenuItem = ({
 };
 
 export default ProfileMenu;
-
-const demoUser = {
-  id: 0,
-  email: 'guest@mail.com',
-  name: 'Guest',
-  avatar: users[13].avatar,
-  designation: 'Merchant Captian ',
-};

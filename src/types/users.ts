@@ -1,12 +1,15 @@
 export interface User {
   id: number;
   name: string;
-  avatar: string;
+  cpf: string;
+  profession?: string;
   email: string;
-  status: string;
-  role: 'Admin' | 'Supervisor' | 'User';
-  department: 'Engineering' | 'Design' | 'Marketing' | 'Human Resources' | 'Finance' | 'Support';
   phone: string;
+  birthday: string;
   location: string;
-  createdAt: string;
+  status: string;
+  physiotherapistId?: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  deletedAt?: string | Date;
 }

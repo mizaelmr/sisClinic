@@ -14,11 +14,11 @@ const NumberTextField = ({
   ref,
   ...rest
 }: NumberTextFieldProps) => {
-  const Component = variant === 'custom' ? StyledTextField : TextField;
   return (
-    <Component
+    <StyledTextField
       ref={ref}
       type="number"
+      inputMode="numeric"
       variant={variant === 'custom' ? 'filled' : variant}
       onChange={(event) => {
         event.target.value = event.target.value.replace(/^0+(?=\d)/, '');

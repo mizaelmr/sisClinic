@@ -75,17 +75,14 @@ const Autocomplete: Components<Omit<Theme, 'components'>>['MuiAutocomplete'] = {
         paddingBottom: 8,
         [`&.${inputBaseClasses.sizeSmall}`]: {
           paddingLeft: 12,
-          // paddingTop: 17,
         },
         [`&.MuiInputBase-sizeLarge`]: {
           paddingLeft: 20,
-          // paddingTop: 24,
           paddingBottom: 8,
         },
       },
     },
     input: {
-      // padding: '4px !important',
       padding: '0px !important',
     },
     tag: {

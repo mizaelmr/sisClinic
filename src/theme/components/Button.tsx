@@ -34,7 +34,6 @@ const btnColors: PaletteColorKey[] = [
   'error',
 ];
 
-//Button soft variants
 const btnCustomVariants: ComponentsVariants['MuiButton'] = btnColors.map((color) => ({
   props: { variant: 'soft', color: color as ButtonProps['color'] },
   style: (style) => {

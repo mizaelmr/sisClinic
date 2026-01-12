@@ -45,7 +45,7 @@ const AccountTabPanel = ({
             icon={panelIcon}
             sx={{ fontSize: 32, display: { xs: 'none', md: 'inline' } }}
           />
-          {title}
+          Informações Pessoais
         </Typography>
       </Stack>
       {children}

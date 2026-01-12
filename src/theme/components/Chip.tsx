@@ -26,7 +26,6 @@ const chipColors: PaletteColorKey[] = [
   'error',
 ];
 
-//Chip soft variants
 const chipSoftVariants: ComponentsVariants['MuiChip'] = chipColors.map((color) => ({
   props: { variant: 'soft', color: color as ChipProps['color'] },
   style: (style) => {

@@ -2,7 +2,6 @@ import { Config, FontFamily, initialConfig } from 'config';
 import { mainDrawerWidth } from 'lib/constants';
 import { setItemToStore } from 'lib/utils';
 
-//Action types
 export const SET_CONFIG = 'SET_CONFIG';
 export const REFRESH = 'REFRESH';
 export const RESET = 'RESET';
@@ -10,7 +9,6 @@ export const COLLAPSE_NAVBAR = 'COLLAPSE_NAVBAR';
 export const EXPAND_NAVBAR = 'EXPAND_NAVBAR';
 export const SET_FONT_FAMILY = 'SET_FONT_FAMILY';
 
-//Action ts type
 export type ACTIONTYPE =
   | { type: typeof SET_CONFIG; payload: Partial<Config> }
   | { type: typeof REFRESH }

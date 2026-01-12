@@ -8,11 +8,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { countries } from 'data/countries';
 import { useAccounts } from 'providers/AccountsProvider';
 import { useBreakpoints } from 'providers/BreakpointsProvider';
 import IconifyIcon from 'components/base/IconifyIcon';
-import CountrySelect from 'components/common/CountrySelect';
 import AccountDialog from '../common/AccountDialog';
 import InfoCard from '../common/InfoCard';
 import InfoCardAttribute from '../common/InfoCardAttribute';
@@ -52,12 +50,6 @@ const Address = () => {
         }}
       >
         <Stack direction="column" spacing={1} p={0.125}>
-          <CountrySelect
-            sx={{ mb: 1 }}
-            fullWidth
-            defaultValue={countries.find((country) => country.label === personalInfo.country)}
-            renderInput={(params) => <TextField label="Country" {...params} />}
-          />
           <TextField
             placeholder="State"
             label="State"

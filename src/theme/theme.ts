@@ -63,7 +63,6 @@ export const themeOverrides = {
     MuiToggleButton: ToggleButton,
     MuiToggleButtonGroup: ToggleButtonGroup,
     MuiButtonBase: ButtonBase,
-    // input fields
     MuiTextField: TextField,
     MuiFilledInput: FilledInput,
     MuiOutlinedInput: OutlinedInput,
@@ -75,7 +74,6 @@ export const themeOverrides = {
     MuiFormControl: FormControl,
     MuiFormControlLabel: FormControlLabel,
     MuiAutocomplete: Autocomplete,
-    // ----------
     MuiBreadcrumbs: Breadcrumbs,
     MuiSelect: Select,
     MuiDialog: Dialog,

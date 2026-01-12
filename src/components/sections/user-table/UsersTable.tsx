@@ -1,18 +1,17 @@
-import { RefObject, useMemo } from 'react';
-import Avatar from '@mui/material/Avatar';
+import { RefObject, useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Chip, { ChipOwnProps } from '@mui/material/Chip';
-import Link from '@mui/material/Link';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
   DataGrid,
-  GRID_CHECKBOX_SELECTION_COL_DEF,
   GridColDef,
   GridRenderCellParams,
 } from '@mui/x-data-grid';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
-import { users } from 'data/users';
+import { collection, getDocs, doc, updateDoc, serverTimestamp, FieldValue, query, where } from 'firebase/firestore';
+import { db } from 'lib/firebase';
+import { useAuth } from 'providers/AuthProvider';
 import dayjs from 'dayjs';
 import { User } from 'types/users';
 import DashboardMenu from 'components/common/DashboardMenu';
@@ -25,11 +24,11 @@ interface UsersTableProps {
 
 const getStatusChipColor = (value: User['status']): ChipOwnProps['color'] => {
   switch (value) {
-    case 'online':
+    case 'active':
       return 'success';
-    case 'offline':
+    case 'inactive':
       return 'error';
-    case 'away':
+    case 'pending':
       return 'warning';
     default:
       return 'neutral';
@@ -37,98 +36,164 @@ const getStatusChipColor = (value: User['status']): ChipOwnProps['color'] => {
 };
 
 const UsersTable = ({ apiRef, filterButtonEl }: UsersTableProps) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUsers = async () => {
+    try {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const usersCollection = collection(db, 'users');
+      const usersQuery = query(usersCollection, where('physiotherapistId', '==', user.uid));
+      const usersSnapshot = await getDocs(usersQuery);
+      
+      const usersData = usersSnapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          return {
+            ...data,
+            id: doc.id,
+          } as unknown as User & { createdAt?: any; deletedAt?: any };
+        })
+        .filter((user) => {
+          return !user.deletedAt;
+        })
+        .sort((a, b) => {
+          if (a.createdAt && b.createdAt) {
+            const aTime = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+            const bTime = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+            return bTime - aTime;
+          }
+          return 0; 
+        });
+
+      setUsers(usersData);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleDelete = async (userId: string | number) => {
+    if (!window.confirm('Tem certeza que deseja deletar este usuário?')) {
+      return;
+    }
+
+    try {
+      const userIdString = String(userId);
+      
+      await updateDoc(doc(db, 'users', userIdString), {
+        deletedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      } as { deletedAt: FieldValue; updatedAt: FieldValue });
+      
+      await fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Erro ao deletar usuário. Tente novamente.');
+    }
+  };
+
+  const handleEdit = (userId: string | number) => {
+    navigate(`/users/edit/${String(userId)}`);
+  };
+
+  const handleStatusToggle = async (userId: string | number, currentStatus: string) => {
+    try {
+      const userIdString = String(userId);
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      
+      await updateDoc(doc(db, 'users', userIdString), {
+        status: newStatus,
+        updatedAt: serverTimestamp(),
+      } as { status: string; updatedAt: FieldValue });
+      
+      await fetchUsers();
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      alert('Erro ao atualizar status do usuário. Tente novamente.');
+    }
+  };
+
   const columns: GridColDef<User>[] = useMemo(
     () => [
       {
-        ...GRID_CHECKBOX_SELECTION_COL_DEF,
-        width: 64,
-      },
-      {
-        field: 'avatar',
-        headerName: 'Avatar',
-        width: 64,
-        sortable: false,
-        filterable: false,
-        align: 'center',
-        headerAlign: 'center',
-        renderCell: (params: GridRenderCellParams<User>) => (
-          <Tooltip title={params.row.name}>
-            <Avatar
-              src={params.row.avatar}
-              alt={params.row.name}
-              sx={{
-                width: 32,
-                height: 32,
-              }}
-            />
-          </Tooltip>
-        ),
-      },
-      {
         field: 'name',
-        headerName: 'Name',
+        headerName: 'Nome',
         minWidth: 160,
         flex: 1,
-      },
-      {
-        field: 'email',
-        headerName: 'Email',
-        minWidth: 230,
-        flex: 1,
-        valueGetter: ({ email }) => email,
-        renderCell: (params: GridRenderCellParams<User>) => (
-          <Link href={`mailto:${params.row.email}`} variant="body2">
-            {params.row.email}
-          </Link>
-        ),
+        sortable: false,
       },
       {
         field: 'status',
         headerName: 'Status',
-        width: 100,
+        width: 120,
         align: 'center',
         headerAlign: 'center',
-        renderCell: (params: GridRenderCellParams<User>) => (
-          <Chip
-            label={params.row.status}
-            color={getStatusChipColor(params.row.status)}
-            sx={{
-              textTransform: 'capitalize',
-            }}
-          />
-        ),
-      },
-      {
-        field: 'role',
-        headerName: 'Role',
-        width: 130,
-        renderCell: (params: GridRenderCellParams<User>) => <Chip label={params.row.role} />,
-      },
-      {
-        field: 'department',
-        headerName: 'Department',
-        width: 150,
+        sortable: false,
+        renderCell: (params: GridRenderCellParams<User>) => {
+          const statusLabel =
+            params.row.status === 'active'
+              ? 'Ativo'
+              : params.row.status === 'inactive'
+                ? 'Inativo'
+                : 'Pendente';
+          return (
+            <Chip
+              label={statusLabel}
+              color={getStatusChipColor(params.row.status)}
+              onClick={() => handleStatusToggle(params.row.id, params.row.status)}
+              sx={{
+                textTransform: 'capitalize',
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8,
+                },
+              }}
+            />
+          );
+        },
       },
       {
         field: 'phone',
-        headerName: 'Phone',
+        headerName: 'Telefone',
         width: 160,
         sortable: false,
         filterable: false,
       },
       {
-        field: 'location',
-        headerName: 'Location',
-        width: 160,
+        field: 'profession',
+        headerName: 'Profissão',
+        width: 180,
         sortable: false,
       },
       {
-        field: 'createdAt',
-        headerName: 'Created At',
-        width: 200,
-        renderCell: (params: GridRenderCellParams<User>) => (
-          <Typography>{dayjs(params.row.createdAt).format('DD MMMM, YYYY')}</Typography>
-        ),
+        field: 'birthday',
+        headerName: 'Data de Aniversário',
+        width: 180,
+        sortable: false,
+        filterable: false,
+        renderCell: (params: GridRenderCellParams<User>) => {
+          if (!params.row.birthday) return '-';
+          const date = dayjs(params.row.birthday);
+          return date.isValid() ? date.format('DD/MM/YYYY') : params.row.birthday;
+        },
+      },
+      {
+        field: 'location',
+        headerName: 'Localização',
+        width: 180,
+        sortable: false,
       },
       {
         field: 'action',
@@ -138,15 +203,17 @@ const UsersTable = ({ apiRef, filterButtonEl }: UsersTableProps) => {
         width: 60,
         align: 'right',
         headerAlign: 'right',
-        renderCell: () => (
+        renderCell: (params: GridRenderCellParams<User>) => (
           <DashboardMenu
             menuItems={[
               {
-                label: 'Edit',
+                label: 'Editar',
+                onClick: () => handleEdit(params.row.id),
               },
               {
-                label: 'Delete',
+                label: 'Deletar',
                 sx: { color: 'error.main' },
+                onClick: () => handleDelete(params.row.id),
               },
             ]}
           />
@@ -155,6 +222,14 @@ const UsersTable = ({ apiRef, filterButtonEl }: UsersTableProps) => {
     ],
     [],
   );
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ width: 1 }}>
@@ -171,7 +246,7 @@ const UsersTable = ({ apiRef, filterButtonEl }: UsersTableProps) => {
             },
           },
         }}
-        checkboxSelection
+        getRowId={(row) => String(row.id) || Math.random().toString()}
         slots={{
           basePagination: (props) => <DataGridPagination showFullPagination {...props} />,
         }}

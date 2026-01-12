@@ -44,14 +44,6 @@ const Input: Components<Omit<Theme, 'components'>>['MuiInput'] = {
 
 export const InputBase: Components<Omit<Theme, 'components'>>['MuiInputBase'] = {
   defaultProps: {},
-  // styleOverrides: {
-  //   root: {
-  //     borderRadius: 8,
-  //   },
-  //   sizeSmall: {
-  //     borderRadius: 4,
-  //   },
-  // },
 };
 
 export default Input;

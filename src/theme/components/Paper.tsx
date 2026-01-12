@@ -42,7 +42,6 @@ const Paper: Components<Omit<Theme, 'components'>>['MuiPaper'] = {
       props: { variant: 'default' },
       style: ({ theme }) => ({
         border: 'none',
-        outline: `1px solid ${theme.vars.palette.divider}`,
         borderRadius: 0,
       }),
     },

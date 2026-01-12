@@ -2,8 +2,6 @@ import { useEffect, useLayoutEffect } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { useSettingsContext } from 'providers/SettingsProvider';
 import { REFRESH } from 'reducers/SettingsReducer';
-import SettingPanelToggler from 'components/settings-panel/SettingPanelToggler';
-import SettingsPanel from 'components/settings-panel/SettingsPanel';
 
 const App = () => {
   const { pathname } = useLocation();
@@ -20,8 +18,6 @@ const App = () => {
   return (
     <>
       <Outlet />
-      <SettingsPanel />
-      <SettingPanelToggler />
     </>
   );
 };

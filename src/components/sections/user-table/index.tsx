@@ -1,4 +1,5 @@
 import { ChangeEvent, MouseEvent, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -7,12 +8,14 @@ import Stack from '@mui/material/Stack';
 import { useGridApiRef } from '@mui/x-data-grid';
 import IconifyIcon from 'components/base/IconifyIcon';
 import StyledTextField from 'components/styled/StyledTextField';
+import paths from 'routes/paths';
 import UsersTable from './UsersTable';
 import FilterSection from './filters/FilterSection';
 
 const UserListContainer = () => {
   const [filterButtonEl, setFilterButtonEl] = useState<HTMLButtonElement | null>(null);
   const apiRef = useGridApiRef();
+  const navigate = useNavigate();
 
   const handleSearch = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -51,15 +54,16 @@ const UserListContainer = () => {
             color="primary"
             startIcon={<IconifyIcon icon="material-symbols:add-rounded" />}
             sx={{ flexShrink: 0 }}
+            onClick={() => navigate(paths.createUser)}
           >
-            Add User
+            Criar Paciente
           </Button>
 
           <StyledTextField
             id="search-box"
             type="search"
             size="medium"
-            placeholder="Search user"
+            placeholder="Pesquisar paciente"
             fullWidth
             slotProps={{
               input: {

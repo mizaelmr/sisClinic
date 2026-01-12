@@ -1,31 +1,57 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Box, Button, Divider, Link, Stack, TextField, Typography } from '@mui/material';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { Alert, Box, Button, Divider, Link, Stack, TextField, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import paths from 'routes/paths';
+import { auth } from 'lib/firebase';
 import PasswordTextField from 'components/common/PasswordTextField';
 import SocialAuth from './SocialAuth';
 
 const SignupForm = () => {
   const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/');
+    setError(null);
+    setLoading(true);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      if (name && userCredential.user) {
+        await updateProfile(userCredential.user, {
+          displayName: name,
+        });
+      }
+      
+      navigate('/');
+    } catch (err: any) {
+      let errorMessage = 'Erro ao criar conta. Tente novamente.';
+      
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = 'Este email já está em uso.';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = 'Email inválido.';
+      } else if (err.code === 'auth/operation-not-allowed') {
+        errorMessage = 'Operação não permitida.';
+      } else if (err.code === 'auth/weak-password') {
+        errorMessage = 'Senha muito fraca. Use pelo menos 6 caracteres.';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Stack
-      direction="column"
-      sx={{
-        height: 1,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        pt: { md: 10 },
-        pb: 10,
-      }}
-    >
-      <div />
-
+    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <Grid
         container
         sx={{
@@ -46,31 +72,29 @@ const SignupForm = () => {
               alignItems: { xs: 'flex-start', sm: 'flex-end' },
             }}
           >
-            <Typography variant="h4">Sign up</Typography>
+            <Typography variant="h4">Cadastrar</Typography>
             <Typography
               variant="subtitle2"
               sx={{
                 color: 'text.secondary',
               }}
             >
-              Already have an account?
+              Já tem uma conta?
               <Link href={paths.login} sx={{ ml: 1 }}>
-                Log in
+                Entrar
               </Link>
             </Typography>
           </Stack>
         </Grid>
 
         <Grid size={12}>
-          <SocialAuth />
-        </Grid>
-        <Grid size={12}>
-          <Divider sx={{ color: 'text.secondary' }}>or use email</Divider>
-        </Grid>
-
-        <Grid size={12}>
           <Box component="form" noValidate onSubmit={handleSubmit}>
             <Grid container>
+              {error && (
+                <Grid size={12} sx={{ mb: 2 }}>
+                  <Alert severity="error">{error}</Alert>
+                </Grid>
+              )}
               <Grid
                 sx={{
                   mb: 3,
@@ -82,8 +106,12 @@ const SignupForm = () => {
                   size="large"
                   id="name"
                   type="text"
-                  label="Name"
+                  label="Nome"
                   variant="filled"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  disabled={loading}
                 />
               </Grid>
               <Grid
@@ -99,6 +127,10 @@ const SignupForm = () => {
                   type="email"
                   label="Email"
                   variant="filled"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
                 />
               </Grid>
               <Grid
@@ -111,24 +143,31 @@ const SignupForm = () => {
                   fullWidth
                   size="large"
                   id="password"
-                  label="Password"
+                  label="Senha"
                   variant="filled"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
                 />
               </Grid>
 
               <Grid size={12}>
-                <Button fullWidth type="submit" size="large" variant="contained">
-                  Create Account
+                <Button 
+                  fullWidth 
+                  type="submit" 
+                  size="large" 
+                  variant="contained"
+                  disabled={loading}
+                >
+                  {loading ? 'Criando conta...' : 'Criar conta'}
                 </Button>
               </Grid>
             </Grid>
           </Box>
         </Grid>
       </Grid>
-      <Link href="#!" variant="subtitle2" sx={{ flex: 1 }}>
-        Trouble signing in?
-      </Link>
-    </Stack>
+    </Box>
   );
 };
 

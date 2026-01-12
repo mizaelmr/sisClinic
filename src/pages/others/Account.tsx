@@ -1,17 +1,16 @@
 import { SyntheticEvent, useState } from 'react';
 import { TabContext } from '@mui/lab';
-import { Container, Drawer, Paper, SnackbarCloseReason, Stack } from '@mui/material';
-import { accountTabs } from 'data/account/account-tabs';
+import { Container, Drawer, Paper, SnackbarCloseReason, Stack, Typography } from '@mui/material';
 import ProSnackbar from 'layouts/main-layout/common/ProSnackbar';
 import AccountsProvider from 'providers/AccountsProvider';
 import { useBreakpoints } from 'providers/BreakpointsProvider';
 import SimpleBar from 'components/base/SimpleBar';
-import SideTabList from 'components/sections/account/SideTabList';
 import AccountTabPanel from 'components/sections/account/common/AccountTabPanel';
+import PersonalInfoTabPanel from 'components/sections/account/personal-info/PersonalInfoTabPanel';
+import IconifyIcon from 'components/base/IconifyIcon';
 
 const Account = () => {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState(accountTabs[0].value);
   const { down } = useBreakpoints();
   const [showTabList, setShowTabList] = useState(true);
 
@@ -21,7 +20,6 @@ const Account = () => {
       setOpen(true);
       return;
     }
-    setActiveTab(newValue);
   };
 
   const handleClose = (_event: SyntheticEvent, reason?: SnackbarCloseReason) => {
@@ -31,53 +29,8 @@ const Account = () => {
 
   return (
     <AccountsProvider>
-      <TabContext value={activeTab}>
+      <TabContext value="personal_information">
         <Stack>
-          {downMd ? (
-            <Drawer
-              hideBackdrop
-              open={showTabList}
-              onClose={() => setShowTabList(false)}
-              ModalProps={{
-                keepMounted: true,
-                disablePortal: true,
-              }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    bgcolor: 'background.elevation1',
-                    width: 1,
-                    overflow: 'hidden',
-                    pointerEvents: 'auto',
-                    height: { xs: 'calc(100vh - 64px)', md: 'calc(100vh - 82px)' },
-                    top: { xs: 65, md: 83 },
-                  },
-                },
-              }}
-              sx={{
-                pointerEvents: 'none',
-              }}
-            >
-              <SimpleBar>
-                <SideTabList setShowTabList={setShowTabList} handleChange={handleChange} />
-              </SimpleBar>
-            </Drawer>
-          ) : (
-            <Paper
-              background={1}
-              sx={{
-                width: { md: 324, lg: 405 },
-                position: 'sticky',
-                top: { xs: 64, md: 82 },
-                height: { xs: 'calc(100vh - 64px)', md: 'calc(100vh - 82px)' },
-              }}
-            >
-              <SimpleBar>
-                <SideTabList setShowTabList={setShowTabList} handleChange={handleChange} />
-              </SimpleBar>
-            </Paper>
-          )}
-
           <Paper sx={{ flex: 1, maxWidth: 1 }}>
             <Container
               maxWidth={false}
@@ -89,18 +42,7 @@ const Account = () => {
                 height: downMd ? 1 : 'auto',
               }}
             >
-              {accountTabs.map((tab) => (
-                <AccountTabPanel
-                  key={tab.id}
-                  label={tab.label}
-                  value={tab.value}
-                  title={tab.title}
-                  panelIcon={tab.panelIcon}
-                  setShowTabList={setShowTabList}
-                >
-                  {tab.tabPanel}
-                </AccountTabPanel>
-              ))}
+              <PersonalInfoTabPanel />
             </Container>
           </Paper>
           <ProSnackbar open={open} onClose={handleClose} />

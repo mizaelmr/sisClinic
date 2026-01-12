@@ -1,14 +1,17 @@
-import { Box, Button, Stack, paperClasses } from '@mui/material';
+import { Box, Button, Stack, Typography, paperClasses } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { useBreakpoints } from 'providers/BreakpointsProvider';
 import { useSettingsContext } from 'providers/SettingsProvider';
 import IconifyIcon from 'components/base/IconifyIcon';
 import Logo from 'components/common/Logo';
-import AppbarActionItems from '../common/AppbarActionItems';
 import SearchBox, { SearchBoxButton } from '../common/search-box/SearchBox';
+import ProfileMenu from '../common/ProfileMenu';
+import { useAuth } from 'providers/AuthProvider';
 
+// HEADER DO SISTEMA
 const AppBar = () => {
+  const { user } = useAuth();
   const {
     config: { drawerWidth },
     handleDrawerToggle,
@@ -31,48 +34,9 @@ const AppBar = () => {
         },
       }}
     >
-      <Toolbar variant="appbar" sx={{ px: { xs: 3, md: 5 } }}>
-        <Box
-          sx={{
-            display: { xs: 'flex', md: 'none' },
-            alignItems: 'center',
-            gap: 1,
-            pr: 2,
-          }}
-        >
-          <Button
-            color="neutral"
-            variant="soft"
-            shape="circle"
-            aria-label="open drawer"
-            onClick={handleDrawerToggle}
-          >
-            <IconifyIcon icon="material-symbols:menu-rounded" sx={{ fontSize: 20 }} />
-          </Button>
-
-          <Box>
-            <Logo showName={upSm} />
-          </Box>
-        </Box>
-
-        <Stack
-          sx={{
-            alignItems: 'center',
-            flex: 1,
-          }}
-        >
-          {upMd ? (
-            <SearchBox
-              sx={{
-                width: 1,
-                maxWidth: 420,
-              }}
-            />
-          ) : (
-            <SearchBoxButton />
-          )}
-          <AppbarActionItems />
-        </Stack>
+      <Toolbar variant="appbar" sx={{ px: { xs: 3, md: 5 }, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>Bem vindo(a) ao Dashfisio, {user?.displayName}</Typography>
+        <ProfileMenu />
       </Toolbar>
     </MuiAppBar>
   );

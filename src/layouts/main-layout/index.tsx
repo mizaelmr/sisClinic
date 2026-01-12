@@ -10,6 +10,7 @@ import NavProvider from './NavProvider';
 import Footer from './footer';
 import SidenavDrawerContent from './sidenav/SidenavDrawerContent';
 
+// LAYOUT PRINCIPAL DO SISTEMA
 const MainLayout = ({ children }: PropsWithChildren) => {
   const {
     config: { drawerWidth, openNavbarDrawer },

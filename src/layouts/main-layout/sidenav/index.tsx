@@ -6,6 +6,7 @@ import { useSettingsContext } from 'providers/SettingsProvider';
 import SidenavCollapse from './SidenavCollapse';
 import SidenavDrawerContent from './SidenavDrawerContent';
 
+// MENU LATERAL (SIDEBAR)
 const Sidenav = () => {
   const {
     config: { sidenavCollapsed, drawerWidth },

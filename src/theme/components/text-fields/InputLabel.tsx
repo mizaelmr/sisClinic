@@ -43,7 +43,6 @@ const InputLabel: Components<Omit<Theme, 'components'>>['MuiInputLabel'] = {
             transform: 'translate(2px,14px) scale(1)',
           },
         },
-        // filled shrink
         {
           props: ({ variant, ownerState }) => variant === 'filled' && getApplyShrink(ownerState),
           style: {
@@ -58,7 +57,6 @@ const InputLabel: Components<Omit<Theme, 'components'>>['MuiInputLabel'] = {
             },
           },
         },
-        // filled shrink adornedStart
         {
           props: ({ variant, ownerState }) =>
             variant === 'filled' &&
@@ -77,7 +75,6 @@ const InputLabel: Components<Omit<Theme, 'components'>>['MuiInputLabel'] = {
             },
           },
         },
-        // filled default adornedStart
         {
           props: ({ variant, ownerState }) =>
             variant === 'filled' &&

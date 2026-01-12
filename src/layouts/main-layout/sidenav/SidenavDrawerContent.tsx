@@ -7,11 +7,10 @@ import { useSettingsContext } from 'providers/SettingsProvider';
 import sitemap from 'routes/sitemap';
 import IconifyIcon from 'components/base/IconifyIcon';
 import Logo from 'components/common/Logo';
-import PromoCard from 'components/common/PromoCard';
 import NavItem from './NavItem';
 import SidenavSimpleBar from './SidenavSimpleBar';
-import promo from '/assets/images/illustrations/5.webp';
 
+// CONTEÚDO DO MENU LATERAL
 interface SidenavDrawerContentProps {
   variant?: 'permanent' | 'temporary';
 }
@@ -105,7 +104,7 @@ const SidenavDrawerContent = ({ variant = 'permanent' }: SidenavDrawerContentPro
                 </Box>
               ))}
             </div>
-            {!sidenavCollapsed && <PromoCard img={promo} imgStyles={{ maxWidth: 136 }} />}
+            {/* {!sidenavCollapsed && <PromoCard img={promo} imgStyles={{ maxWidth: 136 }} />} */}
           </Box>
         </SidenavSimpleBar>
       </Box>

@@ -148,7 +148,7 @@ const Logo = ({ sx, viewBox = '0 0 26 40', showName = true, ...rest }: LogoProps
             transition: 'background-position .3s cubic-bezier(0.8, 0.63, .5, 1)',
           }}
         >
-          aurora
+          dashfisio
         </Typography>
       )}
     </Link>

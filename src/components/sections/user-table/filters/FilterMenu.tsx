@@ -69,18 +69,25 @@ const FilterMenu = ({ label, field, handleFilter, menuItems }: FilterMenuProps) 
         }}
       >
         <MenuItem disableRipple onClick={() => handleMenuItemClick('All')}>
-          All
+          Todos
         </MenuItem>
-        {menuItems.map((item) => (
-          <MenuItem
-            key={item}
-            sx={{ textTransform: 'capitalize' }}
-            onClick={() => handleMenuItemClick(item)}
-            disableRipple
-          >
-            {item}
-          </MenuItem>
-        ))}
+        {menuItems.map((item) => {
+          const getLabel = (value: string) => {
+            if (value === 'active') return 'Ativo';
+            if (value === 'inactive') return 'Inativo';
+            if (value === 'pending') return 'Pendente';
+            return value;
+          };
+          return (
+            <MenuItem
+              key={item}
+              onClick={() => handleMenuItemClick(item)}
+              disableRipple
+            >
+              {getLabel(item)}
+            </MenuItem>
+          );
+        })}
       </Menu>
     </div>
   );
