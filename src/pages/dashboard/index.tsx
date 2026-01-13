@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
-import Grid from '@mui/material/Grid';
 import { 
-  Card, 
-  CardContent, 
   Typography, 
   Box, 
   Chip, 
   Container,
   Button,
   Alert,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,

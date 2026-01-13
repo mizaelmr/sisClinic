@@ -41,19 +41,26 @@ import InputAdornment from './components/text-fields/InputAdornment';
 import InputLabel from './components/text-fields/InputLabel';
 import OutlinedInput from './components/text-fields/OutlinedInput';
 import TextField from './components/text-fields/TextField';
-import { paletteOptions } from './palette';
+import { darkPaletteOptions, paletteOptions } from './palette';
 import shadows from './shadows';
 import sxConfig from './sxConfig';
 
 export const themeOverrides = {
-  cssVariables: { colorSchemeSelector: 'data-aurora-color-scheme', cssVarPrefix: 'aurora' },
+  cssVariables: {
+    colorSchemeSelector: 'data-aurora-color-scheme',
+    cssVarPrefix: 'aurora',
+    modeStorageKey: 'aurora-mode',
+  },
   shadows: ['none', ...shadows],
   colorSchemes: {
     light: {
       palette: paletteOptions,
       shadows: ['none', ...shadows],
     },
-    dark: false,
+    dark: {
+      palette: darkPaletteOptions,
+      shadows: ['none', ...shadows],
+    },
   },
   unstable_sxConfig: sxConfig,
   components: {

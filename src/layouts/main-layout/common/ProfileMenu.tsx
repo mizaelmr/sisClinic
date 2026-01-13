@@ -23,6 +23,7 @@ import StatusAvatar from 'components/base/StatusAvatar';
 import ProSnackbar from './ProSnackbar';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'providers/AuthProvider';
+import { useColorScheme } from '@mui/material/styles';
 
 // MENU DE PERFIL DO USUÁRIO
 interface ProfileMenuItemProps extends MenuItemProps {
@@ -39,8 +40,11 @@ const ProfileMenu = () => {
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  const { mode, setMode } = useColorScheme();
 
-  const handleSnackbarOpen = () => setSnackbarOpen(true);
+  const handleToggleMode = () => {
+    setMode(mode === 'light' ? 'dark' : 'light');
+  };
   const handleSnackbarClose = (_event: SyntheticEvent, reason?: SnackbarCloseReason) => {
     if (reason === 'clickaway') return;
     setSnackbarOpen(false);
@@ -113,8 +117,8 @@ const ProfileMenu = () => {
           }}
         >
           <StatusAvatar
-            status="online"
             alt={displayName}
+            status="online"
             src={userAvatar}
             sx={{ width: 48, height: 48 }}
           />
@@ -143,11 +147,11 @@ const ProfileMenu = () => {
         <Divider />
         <Box sx={{ py: 1 }}>
           <ProfileMenuItem
-            onClick={handleSnackbarOpen}
-            icon="material-symbols:dark-mode-outline-rounded"
+            onClick={handleToggleMode}
+            icon={mode === 'dark' ? 'material-symbols:light-mode-outline-rounded' : 'material-symbols:dark-mode-outline-rounded'}
           >
-            Dark mode
-            <Switch checked={false} sx={{ ml: 'auto' }} />
+            {mode === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+            <Switch checked={mode === 'dark'} sx={{ ml: 'auto' }} />
           </ProfileMenuItem>
         </Box>
         <Divider />

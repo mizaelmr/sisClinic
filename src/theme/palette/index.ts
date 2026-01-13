@@ -221,3 +221,107 @@ export const paletteOptions: PaletteOptions = {
   chOrange,
   chLightBlue,
 };
+
+// Dark mode palette
+const primaryDark = generatePaletteChannel({
+  lighter: blue[100],
+  light: blue[400],
+  main: blue[400],
+  dark: blue[500],
+  darker: blue[700],
+});
+const secondaryDark = generatePaletteChannel({
+  lighter: purple[100],
+  light: purple[300],
+  main: purple[400],
+  dark: purple[500],
+  darker: purple[700],
+});
+const errorDark = generatePaletteChannel({
+  lighter: red[100],
+  light: red[300],
+  main: red[400],
+  dark: red[500],
+  darker: red[700],
+});
+const warningDark = generatePaletteChannel({
+  lighter: orange[100],
+  light: orange[300],
+  main: orange[400],
+  dark: orange[500],
+  darker: orange[700],
+  contrastText: common.white,
+});
+const successDark = generatePaletteChannel({
+  lighter: green[100],
+  light: green[300],
+  main: green[400],
+  dark: green[500],
+  darker: green[700],
+});
+const infoDark = generatePaletteChannel({
+  lighter: lightBlue[100],
+  light: lightBlue[300],
+  main: lightBlue[400],
+  dark: lightBlue[500],
+  darker: lightBlue[700],
+  contrastText: common.white,
+});
+const neutralDark = generatePaletteChannel({
+  lighter: grey[200],
+  light: grey[400],
+  main: grey[500],
+  dark: grey[600],
+  darker: grey[700],
+  contrastText: common.white,
+});
+
+const actionDark = generatePaletteChannel({
+  active: grey[300],
+  hover: grey[800],
+  selected: grey[800],
+  disabled: grey[600],
+  disabledBackground: grey[700],
+  focus: grey[700],
+});
+const dividerDark = cssVarRgba(grey['700Channel'], 0.2);
+const menuDividerDark = cssVarRgba(grey['700Channel'], 0.2);
+const dividerLightDark = cssVarRgba(grey['700Channel'], 0.3);
+const textDark = generatePaletteChannel({
+  primary: grey[50],
+  secondary: grey[300],
+  disabled: grey[600],
+});
+const backgroundDark = generatePaletteChannel({
+  elevation1: grey[900],
+  elevation2: grey[800],
+  elevation3: grey[700],
+  elevation4: grey[600],
+  menu: grey[950],
+  menuElevation1: grey[900],
+  menuElevation2: grey[800],
+});
+
+export const darkPaletteOptions: PaletteOptions = {
+  common,
+  grey,
+  primary: primaryDark,
+  secondary: secondaryDark,
+  error: errorDark,
+  warning: warningDark,
+  success: successDark,
+  info: infoDark,
+  neutral: neutralDark,
+  action: actionDark,
+  divider: dividerDark,
+  dividerLight: dividerLightDark,
+  menuDivider: menuDividerDark,
+  text: textDark,
+  background: backgroundDark,
+  chGrey,
+  chRed,
+  chBlue,
+  chGreen,
+  chOrange,
+  chLightBlue,
+};

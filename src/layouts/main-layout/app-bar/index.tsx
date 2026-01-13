@@ -1,11 +1,7 @@
-import { Box, Button, Stack, Typography, paperClasses } from '@mui/material';
+import { Typography, paperClasses } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { useBreakpoints } from 'providers/BreakpointsProvider';
 import { useSettingsContext } from 'providers/SettingsProvider';
-import IconifyIcon from 'components/base/IconifyIcon';
-import Logo from 'components/common/Logo';
-import SearchBox, { SearchBoxButton } from '../common/search-box/SearchBox';
 import ProfileMenu from '../common/ProfileMenu';
 import { useAuth } from 'providers/AuthProvider';
 
@@ -14,12 +10,7 @@ const AppBar = () => {
   const { user } = useAuth();
   const {
     config: { drawerWidth },
-    handleDrawerToggle,
   } = useSettingsContext();
-
-  const { up } = useBreakpoints();
-  const upSm = up('sm');
-  const upMd = up('md');
 
   return (
     <MuiAppBar
