@@ -12,7 +12,6 @@ import {
   DialogActions,
   TextField,
 } from '@mui/material';
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
@@ -20,9 +19,10 @@ import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/pt-br';
 import { useGoogleCalendar } from 'hooks/useGoogleCalendar';
 import IconifyIcon from 'components/base/IconifyIcon';
+import { Calendar } from 'components/Calendar';
 
 // COMPONENTE DE CALENDÁRIO E AGENDAMENTOS
-const Calendar = () => {
+const DashboardCalendar = () => {
   const { 
     isSignedIn, 
     loading: googleLoading,
@@ -159,47 +159,36 @@ const Calendar = () => {
               </ul>
             </Alert>
           )}
-          {!isSignedIn && isLoaded && (
-            <Alert severity="info" sx={{ mb: 2 }}>
-              Conecte-se ao Google Calendar para sincronizar seus agendamentos.
-              <Button
-                size="small"
-                onClick={handleConnectGoogle}
-                disabled={googleLoading || !isLoaded}
-                sx={{ ml: 2 }}
-                startIcon={<IconifyIcon icon="logos:google-icon" />}
-              >
-                {googleLoading ? 'Carregando...' : 'Conectar Google Calendar'}
-              </Button>
-            </Alert>
-          )}
-          
-          <DateCalendar
-            value={selectedDate}
-            onChange={handleDateChange}
-            sx={{
-              '& .MuiPickersDay-root': {
-                position: 'relative',
-                '&.Mui-selected': {
-                  backgroundColor: 'primary.main',
-                },
-              },
-            }}
-          />
+          <Calendar selectedDate={selectedDate} handleDateChange={handleDateChange} />
         </Box>
         
         <Box sx={{ flex: 1, mt: { xs: 2, md: 0 } }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
               Agendamentos para {selectedDate?.format('DD/MM/YYYY')}
             </Typography>
-            <Chip
-              label="+ Adicionar"
-              onClick={handleAddAppointment}
-              color="primary"
-              variant="outlined"
-              sx={{ cursor: 'pointer' }}
-            />
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              {!isSignedIn && isLoaded && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleConnectGoogle}
+                  disabled={googleLoading || !isLoaded}
+                  startIcon={<IconifyIcon icon="logos:google-icon" />}
+                >
+                  {googleLoading ? 'Conectando...' : 'Conectar'}
+                </Button>
+              )}
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={handleAddAppointment}
+                disabled={!isSignedIn}
+                startIcon={<IconifyIcon icon="mdi:plus" />}
+              >
+                Adicionar
+              </Button>
+            </Box>
           </Box>
           
           {getAppointmentsForDate(selectedDate).length > 0 ? (
@@ -280,7 +269,7 @@ const Dashboard = () => {
   return (
     <Container>
       <Typography variant="h6" sx={{ mt: 2 }}>Agenda:</Typography>
-      <Calendar />
+      <DashboardCalendar />
     </Container>
   );
 };

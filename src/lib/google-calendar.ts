@@ -1,8 +1,12 @@
+import { getItemFromStore, setItemToStore, removeItemFromStore } from 'lib/utils';
+
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 export const GOOGLE_CLIENT_SECRET = import.meta.env.VITE_GOOGLE_CLIENT_SECRET || '';
 export const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || '';
 
 export const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events';
+
+const GOOGLE_TOKEN_STORAGE_KEY = 'google_calendar_token';
 
 export interface GoogleCalendarEvent {
     id: string;
@@ -20,6 +24,39 @@ export interface GoogleCalendarEvent {
 
 let tokenClient: any = null;
 let accessToken: string | null = null;
+
+const saveTokenToStorage = (token: any): void => {
+  try {
+    if (token && token.access_token) {
+      setItemToStore(GOOGLE_TOKEN_STORAGE_KEY, JSON.stringify(token));
+      console.log('Token salvo no localStorage');
+    }
+  } catch (error) {
+    console.error('Erro ao salvar token no localStorage:', error);
+  }
+};
+
+const restoreTokenFromStorage = (): any => {
+  try {
+    const savedToken = getItemFromStore(GOOGLE_TOKEN_STORAGE_KEY);
+    if (savedToken && savedToken.access_token) {
+      console.log('Token restaurado do localStorage');
+      return savedToken;
+    }
+  } catch (error) {
+    console.error('Erro ao restaurar token do localStorage:', error);
+  }
+  return null;
+};
+
+const clearTokenFromStorage = (): void => {
+  try {
+    removeItemFromStore(GOOGLE_TOKEN_STORAGE_KEY);
+    console.log('Token removido do localStorage');
+  } catch (error) {
+    console.error('Erro ao remover token do localStorage:', error);
+  }
+};
 
 export const loadGoogleCalendarScript = (): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -96,8 +133,21 @@ export const loadGoogleCalendarScript = (): Promise<void> => {
             callback: (tokenResponse: any) => {
               accessToken = tokenResponse.access_token;
               console.log('Token de acesso obtido');
+              saveTokenToStorage(tokenResponse);
             },
           });
+          
+          const savedToken = restoreTokenFromStorage();
+          if (savedToken) {
+            try {
+              window.gapi.client.setToken(savedToken);
+              accessToken = savedToken.access_token;
+              console.log('Token restaurado e aplicado com sucesso');
+            } catch (error) {
+              console.warn('Erro ao aplicar token restaurado, será necessário fazer login novamente:', error);
+              clearTokenFromStorage();
+            }
+          }
           
           resolve();
         }).catch((error: any) => {
@@ -125,7 +175,7 @@ export const loadGoogleCalendarScript = (): Promise<void> => {
     });
   };
 
-  export const signInWithGoogle = async (): Promise<boolean> => {
+  export const signInWithGoogle = async (forceConsent: boolean = false): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
         if (!tokenClient) {
@@ -133,10 +183,29 @@ export const loadGoogleCalendarScript = (): Promise<void> => {
           return;
         }
 
-        if (accessToken) {
-          window.gapi.client.setToken({ access_token: accessToken });
+        const existingToken = window.gapi.client.getToken();
+        if (existingToken && !forceConsent) {
+          accessToken = existingToken.access_token;
+          window.gapi.client.setToken(existingToken);
+          saveTokenToStorage(existingToken);
           resolve(true);
           return;
+        }
+
+        if (!forceConsent) {
+          const savedToken = restoreTokenFromStorage();
+          if (savedToken && savedToken.access_token) {
+            try {
+              window.gapi.client.setToken(savedToken);
+              accessToken = savedToken.access_token;
+              console.log('Token restaurado do localStorage e aplicado');
+              resolve(true);
+              return;
+            } catch (error) {
+              console.warn('Token salvo inválido, será necessário fazer login novamente');
+              clearTokenFromStorage();
+            }
+          }
         }
 
         tokenClient.callback = (response: any) => {
@@ -153,15 +222,13 @@ export const loadGoogleCalendarScript = (): Promise<void> => {
           }
 
           accessToken = response.access_token;
-          window.gapi.client.setToken({ access_token: accessToken });
+          window.gapi.client.setToken(response);
+          saveTokenToStorage(response);
+          console.log('Login realizado e token salvo com sucesso');
           resolve(true);
         };
 
-        if (window.gapi.client.getToken() === null) {
-          tokenClient.requestAccessToken({ prompt: 'consent' });
-        } else {
-          tokenClient.requestAccessToken({ prompt: '' });
-        }
+        tokenClient.requestAccessToken({ prompt: forceConsent ? 'consent' : '' });
       } catch (error: any) {
         console.error('Erro ao fazer login com Google:', error);
         reject(new Error(error.message || 'Erro ao fazer login com Google'));
@@ -177,16 +244,25 @@ export const loadGoogleCalendarScript = (): Promise<void> => {
         window.gapi.client.setToken('');
         accessToken = null;
       }
+      clearTokenFromStorage();
+      console.log('Logout realizado e token removido do localStorage');
     } catch (error) {
       console.error('Erro ao fazer logout do Google:', error);
+      clearTokenFromStorage();
     }
   };
   
   export const isGoogleSignedIn = (): boolean => {
     try {
-      if (!window.gapi || !window.gapi.client) return false;
-      const token = window.gapi.client.getToken();
-      return token !== null && token !== undefined;
+      if (window.gapi && window.gapi.client) {
+        const token = window.gapi.client.getToken();
+        if (token !== null && token !== undefined) {
+          return true;
+        }
+      }
+      
+      const savedToken = restoreTokenFromStorage();
+      return savedToken !== null && savedToken !== undefined;
     } catch (error) {
       console.error('Erro ao verificar status de login:', error);
       return false;

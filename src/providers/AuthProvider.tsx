@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from 'lib/firebase';
+import { signOutGoogle } from 'lib/google-calendar';
 
 interface AuthContextType {
   user: User | null;
@@ -40,6 +41,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signOut = async () => {
+    try {
+      await signOutGoogle();
+    } catch (error) {
+      console.error('Erro ao desconectar Google Calendar:', error);
+    }
     await firebaseSignOut(auth);
   };
 
